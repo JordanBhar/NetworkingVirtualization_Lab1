@@ -4,16 +4,17 @@ from mininet.net import Mininet
 from mininet.node import Controller, RemoteController, OVSController
 from mininet.node import CPULimitedHost, Host, Node
 from mininet.node import OVSKernelSwitch, UserSwitch
-from mininet.link import TCLink, Intf
+from mininet.node import IVSSwitch
 from mininet.cli import CLI
 from mininet.log import setLogLevel, info
+from mininet.link import TCLink, Intf
 from subprocess import call
 
 def createNetwork():
-    net = Mininet(topo=None, build=False, ipBase='10.99.1.0/24')
+    net = Mininet( topo=None, build=False, ipBase='10.0.0.0/8')
 
     info('*** Adding controller\n')
-    controller = net.addController(name='kmc0',
+    kmc0=net.addController(name='kmc0',
                                    controller=Controller,
                                    protocol='tcp',
                                    port=6633)
@@ -46,10 +47,13 @@ def createNetwork():
     # Connect hosts to switches
     net.addLink(kms21, kmh211)
     net.addLink(kms21, kmh212)
+
     net.addLink(kms22, kmh221)
     net.addLink(kms22, kmh222)
+
     net.addLink(kms23, kmh231)
     net.addLink(kms23, kmh232)
+
     net.addLink(kms24, kmh241)
     net.addLink(kms24, kmh242)
 
@@ -61,12 +65,12 @@ def createNetwork():
         controller.start()
 
     info('*** Starting switches\n')
-    net.get('kms11').start([controller])
-    net.get('kms12').start([controller])
-    net.get('kms21').start([controller])
-    net.get('kms22').start([controller])
-    net.get('kms23').start([controller])
-    net.get('kms24').start([controller])
+    net.get('kms11').start([kmc0])
+    net.get('kms12').start([kmc0])
+    net.get('kms21').start([kmc0])
+    net.get('kms22').start([kmc0])
+    net.get('kms23').start([kmc0])
+    net.get('kms24').start([kmc0])
 
     info('*** Post configure switches and hosts\n')
     CLI(net)
@@ -76,3 +80,4 @@ def createNetwork():
 if __name__ == '__main__':
     setLogLevel('info')
     createNetwork()
+
